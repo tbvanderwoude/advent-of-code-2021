@@ -1,4 +1,4 @@
-module Main where
+module Day02 where
 
 import Lib
 
