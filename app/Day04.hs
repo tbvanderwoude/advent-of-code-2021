@@ -32,9 +32,9 @@ main =
      print $ squidGameUntilEnd numbers grids
 
 squidGame [] _ = undefined
-squidGame (n:ns) grids = if (or winningGrids) then (n * (getScore ((fst . head) (filter (\(x,w) -> w) (zip markedGrids winningGrids))))) else squidGame ns markedGrids
+squidGame (n:ns) grids = if (not . null $ winningGrids) then (n * (getScore (head winningGrids))) else squidGame ns markedGrids
  where markedGrids = map (markNumber n) grids :: [Grid]
-       winningGrids = map checkBingo markedGrids :: [Bool]
+       winningGrids = filter checkBingo markedGrids :: [Grid]
 
 squidGameUntilEnd :: [Int] -> [Grid] -> Int
 squidGameUntilEnd ns [g] = squidGame ns [g]
