@@ -3,34 +3,23 @@ module Main where
 import Data.Bits
 import Lib
 
-addLists :: Num a => [a] -> [a] -> [a]
-addLists xs ys = map (uncurry (+)) (zip xs ys)
-
-repVecAdd :: Num a => [a] -> [[a]] -> [a]
-repVecAdd as bss = foldr addLists as bss 
 
 binMap '0' = 0
 binMap '1' = 1
 binMap c = undefined 
 
-findOxygen :: [[Int]] -> [Int]
-findOxygen (x:[]) = x
-findOxygen [] = undefined
-findOxygen xss = b : findOxygen (map tail (filter (\xs -> b == (head xs)) xss))
-        where l = length xss
-              b = if sum [head xs | xs <- xss] * 2 >= l then 1 else 0
-
-findScrubber :: [[Int]] -> [Int]
-findScrubber (x:[]) = x
-findScrubber [] = undefined
-findScrubber xss = b : findScrubber (map tail (filter (\xs -> b == (head xs)) xss))
-        where l = length xss
-              b = if sum [head xs | xs <- xss] * 2 < l then 1 else 0
-
 constructInt (x:xs) = x + 2 * (constructInt xs) 
 constructInt [] = 0
 
 binToInt xs = constructInt . reverse $ xs
+
+-- Bool signifies whether to look for O2 or CO2
+findRating :: Bool -> [[Int]] -> [Int]
+findRating o (x:[]) = x
+findRating o [] = undefined
+findRating o xss = b : findRating o (map tail (filter (\xs -> b == (head xs)) xss))
+        where l = length xss
+              b = if o then if sum [head xs | xs <- xss] * 2 >= l then 1 else 0 else if sum [head xs | xs <- xss] * 2 < l then 1 else 0
 
 main :: IO ()
 main = 
@@ -44,6 +33,6 @@ main =
      let gamma = constructInt (reverse binary) :: Int
      let epsilon = (complement gamma) `mod` (shiftL 2 (d-1))
      print (gamma, epsilon, (epsilon * gamma))
-     let oxRating = (binToInt. findOxygen) inp
-     let carbRating = (binToInt . findScrubber) inp
+     let oxRating = (binToInt. (findRating True)) inp
+     let carbRating = (binToInt . (findRating False)) inp
      print (oxRating,carbRating,(oxRating * carbRating))

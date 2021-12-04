@@ -32,7 +32,7 @@ _exe-defs: &exe-defaults
 
 executables:
   day01:
-    main:                Day03.hs
+    main:                Day04.hs
     <<: *exe-defaults
 
 tests:
