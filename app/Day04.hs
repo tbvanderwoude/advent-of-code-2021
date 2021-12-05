@@ -5,11 +5,6 @@ import Debug.Trace
 
 type Grid = [[Int]]
 
-split :: Eq a => a -> [a] -> [[a]]
-split c xs = case break (==c) xs of
- (ls,[])-> [ls]
- (ls, x:rs) -> ls : split c rs
-
 gridFromList :: [String] -> Grid
 gridFromList [] = []
 gridFromList (xs:xss) = (map read $ (filter (/="") $ split ' ' xs)) : gridFromList xss
@@ -32,7 +27,9 @@ main =
      print $ squidGameUntilEnd numbers grids
 
 squidGame [] _ = undefined
-squidGame (n:ns) grids = if (not . null $ winningGrids) then (n * (getScore (head winningGrids))) else squidGame ns markedGrids
+squidGame (n:ns) grids = case winningGrids of
+                              [] -> squidGame ns markedGrids
+                              (w:ws) -> n * getScore w
  where markedGrids = map (markNumber n) grids :: [Grid]
        winningGrids = filter checkBingo markedGrids :: [Grid]
 

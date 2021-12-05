@@ -11,6 +11,9 @@ addVec [] = undefined
 
 enumerate xs = zip [0..] xs
 
+mapTuple :: (a -> b) -> (a,a) -> (b,b)
+mapTuple f t = (f (fst t), f (snd t))
+
 transpose :: [[a]] -> [[a]]
 transpose xss = [[(xss !! j) !! i | (j,_) <- enumerate xs] | (i,xs) <- enumerate xss] 
 
@@ -24,3 +27,9 @@ getWords path = (map words) <$> readLines path
 
 cartProd :: [a] -> [b] -> [(a,b)]
 cartProd xs ys = [(x,y) | x <- xs, y <- ys]
+
+split :: Eq a => a -> [a] -> [[a]]
+split c xs = case break (==c) xs of
+ (ls,[])-> [ls]
+ (ls, x:rs) -> ls : split c rs
+
