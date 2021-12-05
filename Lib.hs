@@ -4,12 +4,12 @@ addLists :: Num a => [a] -> [a] -> [a]
 addLists xs ys = map (uncurry (+)) (zip xs ys)
 
 repVecAdd :: Num a => [a] -> [[a]] -> [a]
-repVecAdd as bss = foldr addLists as bss 
+repVecAdd = foldr addLists 
 
 addVec (xs:xss) = repVecAdd xs xss
 addVec [] = undefined
 
-enumerate xs = zip [0..] xs
+enumerate = zip [0..]
 
 mapTuple :: (a -> b) -> (a,a) -> (b,b)
 mapTuple f t = (f (fst t), f (snd t))
