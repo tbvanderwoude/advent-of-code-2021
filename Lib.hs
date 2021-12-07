@@ -1,13 +1,19 @@
 module Lib where
 
 addLists :: Num a => [a] -> [a] -> [a]
-addLists xs ys = map (uncurry (+)) (zip xs ys)
+addLists = combineLists (uncurry (+))
+
+subLists = combineLists (uncurry (-))
+
 
 repVecAdd :: Num a => [a] -> [[a]] -> [a]
 repVecAdd = foldr addLists 
 
 addVec (xs:xss) = repVecAdd xs xss
 addVec [] = undefined
+
+combineLists f xs ys = map f (zip xs ys)
+
 
 enumerate = zip [0..]
 
