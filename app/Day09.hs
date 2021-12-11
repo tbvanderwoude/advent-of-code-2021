@@ -11,7 +11,6 @@ type Grid a = [[a]]
 
 type Point = (Int,Int)
 
-getDims :: (Grid Int) -> (Int,Int)
 getDims grid = (length (head grid), length grid)
 
 getPoint grid (x,y) = (grid !! y) !! x
