@@ -22,7 +22,11 @@ rmdups :: Eq a => [a] -> [a]
 rmdups [] = []
 rmdups (x : xs) = x : rmdups (filter (/= x) xs)
 
-showGrid grid = (map (\x-> concat (map show x)) grid)
+intToChar x = chr (ord '0' + x)
+
+convertRow = map intToChar
+
+showGrid grid = concat [convertRow row ++ "\n"| row <- grid]
 
 fillGrid points grid = [[if (elem (i,j) points) then 9 else v | (i,v) <- enumerate xs] | (j,xs) <- enumerate grid]
 
@@ -39,14 +43,17 @@ getNeighbours grid (x,y)= filter (\(x,y) -> x < w && x >= 0 && y < h && y >= 0) 
 
 main :: IO ()
 main = 
-  do inp <- readLines "inputs/input09_test.txt"
+  do inp <- readLines "inputs/input09.txt"
      let numGrid = map (map digitToInt) inp :: Grid Int
-     let neighGrid = [[(v, minimum (map (getPoint numGrid) (getNeighbours numGrid (i,j)))) | (i,v) <- enumerate xs] | (j,xs) <- enumerate numGrid] 
-     let minima = filter (\(x,y) -> x < y) (concat neighGrid)
+     let neighGrid = [[((v, minimum (map (getPoint numGrid) (getNeighbours numGrid (i,j)))),(i,j)) | (i,v) <- enumerate xs] | (j,xs) <- enumerate numGrid] 
+     let minima = filter (\((x,y),p) -> x < y) (concat neighGrid)
      let num = length minima
-     let p1 = (sum (map fst minima)) + num
+     let p1 = (sum (map (fst . fst) minima)) + num
+     let minimaCoords = map snd minima
      print minima
      print p1
-     print (basinSize [head minima] numGrid)
-     sequence (map print $ showGrid numGrid)
+     let basins = sort [basinSize [minCoord] numGrid | minCoord <- minimaCoords ]
+     -- let basinSizes = [basinSize [mnm] numGrid | mnm <- minima] 
+     print (product (take 3 $ reverse basins))
+     --print basinSizes
      return () 
