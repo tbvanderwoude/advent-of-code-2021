@@ -17,10 +17,6 @@ getPoint grid (x,y) = (grid !! y) !! x
 
 mapGrid f grid = [[f v | v <- xs] | xs <- grid]
 
-rmdups :: Eq a => [a] -> [a]
-rmdups [] = []
-rmdups (x : xs) = x : rmdups (filter (/= x) xs)
-
 intToChar x = chr (ord '0' + x)
 
 convertRow = map intToChar

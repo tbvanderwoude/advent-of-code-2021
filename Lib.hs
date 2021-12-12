@@ -9,6 +9,10 @@ subLists = combineLists (uncurry (-))
 repVecAdd :: Num a => [a] -> [[a]] -> [a]
 repVecAdd = foldr addLists 
 
+rmdups :: Eq a => [a] -> [a]
+rmdups [] = []
+rmdups (x : xs) = x : rmdups (filter (/= x) xs)
+
 addVec (xs:xss) = repVecAdd xs xss
 addVec [] = undefined
 
