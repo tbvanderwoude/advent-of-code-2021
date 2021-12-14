@@ -5,6 +5,8 @@ addLists = combineLists (uncurry (+))
 
 subLists = combineLists (uncurry (-))
 
+applyN :: Int -> (a -> a) -> (a -> a)
+applyN n f = foldr1 (.) (replicate n f)
 
 repVecAdd :: Num a => [a] -> [[a]] -> [a]
 repVecAdd = foldr addLists 
