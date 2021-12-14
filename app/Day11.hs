@@ -35,7 +35,7 @@ getNeighbours grid (x,y)= filter (\(x,y) -> x < w && x >= 0 && y < h && y >= 0) 
 lookupIncrement :: [(Point,Int)] -> Point -> Int
 lookupIncrement m p = case lookup p m of 
                        (Just v) -> v
-		       Nothing -> 0
+                       Nothing -> 0
 
 flashGrid :: (Grid (Int,Bool),Int) -> (Grid (Int,Bool), Int)
 flashGrid (grid,counts) = if (null updates) then (mapGrid (\(v,f) -> if f then (0,True) else (v,False)) $ finalGrid, counts + additionalFlashes) else flashGrid (finalGrid,counts + additionalFlashes) 
@@ -48,8 +48,6 @@ flashGrid (grid,counts) = if (null updates) then (mapGrid (\(v,f) -> if f then (
 update :: (Grid (Int,Bool),Int) -> (Grid (Int,Bool),Int)
 update (grid, count) = trace (processResult grid) $ flashGrid (baseGrid, count)
  where baseGrid = mapGrid (\(v,f) -> (v+1,False)) grid 
-
-applyN n f = foldr1 (.) (replicate n f)
 
 checkedIteration n grid = if (sum (map (\(v,f) -> if f then 1 else 0 ) (concat updatedGrid)) == 100) then (n+1) else checkedIteration (n+1) updatedGrid
  where (updatedGrid,count) = update (grid,0)

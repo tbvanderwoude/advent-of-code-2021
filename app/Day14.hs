@@ -7,7 +7,7 @@ import Debug.Trace
 polymerize _ [x] = [x]
 polymerize rules (a:(b:cs)) = case lookup (a,b) rules of 
                                      Just i -> (a:(i:(polymerize rules (b:cs))))
-				     Nothing -> (a:(polymerize rules (b:cs)))
+                                     Nothing -> (a:(polymerize rules (b:cs)))
 
 parseRule :: String -> ((Char,Char),Char)
 parseRule l = ((i !! 0, i !! 1),o !! 0)
@@ -22,11 +22,11 @@ type Polymer = (Count (Char,Char),Count Char)
 
 pairMap rules ((x,y),c) = case lookup (x,y) rules of
                                Just i -> [((x,i),c),((i,y),c)]
-			       Nothing -> undefined    
+                               Nothing -> undefined    
 
 genElem rules ((x,y),c) = case lookup (x,y) rules of 
                                Just i -> [(i,c)]
-			       Nothing -> undefined
+                               Nothing -> undefined
 
 abstractPolymerize :: [((Char,Char),Char)] -> Polymer -> Polymer 
 abstractPolymerize rules (pairs, elements) = (newPairs,newCounts) 
