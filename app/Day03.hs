@@ -1,4 +1,4 @@
-module Main where
+module Day03 where
 
 import Data.Bits
 import Lib

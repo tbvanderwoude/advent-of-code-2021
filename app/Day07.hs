@@ -1,4 +1,4 @@
-module Main where
+module Day07 where
 
 import Lib
 import Data.List

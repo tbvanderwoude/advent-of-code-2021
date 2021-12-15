@@ -1,4 +1,4 @@
-module Main where
+module Day12 where
 
 import Lib
 import Control.Monad

@@ -1,4 +1,4 @@
-module Main where
+module Day14 where
 
 import Lib
 import Data.List
@@ -13,10 +13,10 @@ parseRule :: String -> ((Char,Char),Char)
 parseRule l = ((i !! 0, i !! 1),o !! 0)
  where (i:(_:(o:[]))) = words l
 
-generatePairs :: String -> [((Char,Char),Int)]
+generatePairs :: String -> [((Char,Char),Integer)]
 generatePairs s = count (zip s (tail s)) 
 
-type Count a = [(a,Int)]
+type Count a = [(a,Integer)]
 
 type Polymer = (Count (Char,Char),Count Char)
 
@@ -38,7 +38,7 @@ mergeCounts xs = map (\xs -> (fst (head xs),sum (map snd xs))) . groupBy (\(a,b)
 
 
 count :: Ord a => [a] -> Count a 
-count = (map (\xs -> (head xs, length xs))) . group . sort 
+count = (map (\xs -> (head xs, fromIntegral $ length xs))) . group . sort 
 
 
 solve n rules templatePolymer = print (last counts - head counts)

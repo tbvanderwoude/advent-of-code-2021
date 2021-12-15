@@ -1,4 +1,4 @@
-module Main where
+module Day04 where
 
 import Lib
 import Debug.Trace
