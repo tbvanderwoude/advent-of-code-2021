@@ -5,14 +5,16 @@ import Data.List
 import Debug.Trace
 import Data.Char
 import Numeric (readHex)
+import Parsing
+
+import Data.Char (digitToInt)
+import Data.List (foldl')
+
+toDec :: String -> Int
+toDec = foldl' (\acc x -> acc * 2 + digitToInt x) 0
 
 intToBinSeq :: Int -> [Int]
 intToBinSeq = (padZeroes 4) . reverse . converter
-
--- Removes leading padding 
-binToInt :: [Int] -> Int
-binToInt (0:bs) = binToInt bs 
-binToInt bs = backConv . reverse $ bs
 
 backConv (0:bs) = 2 * backConv bs 
 backConv (1:bs) = 1 + 2 * backConv bs
@@ -25,43 +27,85 @@ converter 0 = []
 converter n = (n `mod` 2) : (converter (n `div` 2))
 charToInt c = fst . head $ readHex [c]
 
-charToBinSeq :: Char -> [Int]
-charToBinSeq = intToBinSeq . charToInt
+intToBin 0 = '0'
+intToBin 1 = '1'
+intToBin _ = undefined
 
-type Binary = [Int]
+charToBinSeq :: Char -> String 
+charToBinSeq = (map intToBin) . intToBinSeq . charToInt
 
-parsePacket bs | t == 4 = parseValue r 
-               | otherwise = 0
- where (v,t,r) = parseHeader bs
+data Packet = ValPacket Int Int | OpPacket Int Int [Packet]
+ deriving Show
 
-chunk :: Int -> [a] -> [[a]]
-chunk _ [] = []
-chunk n xs = h : (chunk n t)
- where (h,t) = splitAt n xs
 
-wholeChunk :: Int -> [a] -> [[a]]
-wholeChunk n xs = filter (\as -> length as == n) . (chunk n) $ xs
+versionSum (ValPacket v _) = v
+versionSum (OpPacket v t ps) = v + sum (map versionSum ps)
 
-parseValue bs = binToInt xs
- where (xs,r) = constructBinStr bs
+evalAll = map evaluate 
 
-constructBinStr :: Binary -> (Binary,Binary)
-constructBinStr bs | f == 0 = (vs,r1)
-                   | f == 1 = (\(x,y) -> (vs ++ x,y)) (constructBinStr r1)
- where ((f:vs),r1) = trace (show bs) splitAt 5 bs 
-  
+typeToFunc :: Int -> ([Int] -> Int)
+typeToFunc t = case t of 
+             0 -> sum
+             1 -> product
+	     2 ->  minimum
+	     3 -> maximum 
+	     5 -> \xs -> if (xs !! 0) > (xs !! 1) then 1 else 0
+	     6 -> \xs -> if (xs !! 0) < (xs !! 1) then 1 else 0 
+	     7 -> \xs -> if (xs !! 0) == (xs !! 1) then 1 else 0
+	     _ -> head 
+	    
+evaluate (ValPacket _ v) = v
+evaluate (OpPacket v t ps) = f recEvals 
+ where recEvals = map evaluate ps :: [Int]
+       f = typeToFunc t :: ([Int] -> Int)
 
-parseHeader :: Binary -> (Int,Int,Binary)
-parseHeader bs = (binToInt vNo, binToInt tId,r2)
- where (vNo,r1) = splitAt 3 bs
-       (tId,r2) = splitAt 3 r1
+takeN n = sequence (replicate n item)
+
+parseBinNum :: Int -> Parser Int
+parseBinNum n = do s <- takeN n
+                   return (toDec s)
+
+parseChunks :: Parser String 
+parseChunks = do s <- takeN 5 
+                 if (head s) == '1' then ((tail s)++) <$> parseChunks else return (tail s)
+                     
+parseValue :: Int -> Parser Packet
+parseValue v = do rawValue <- parseChunks 
+                  return $ ValPacket v (toDec rawValue) 
+
+limitParser :: Parser a -> Int -> Parser a
+limitParser p n = P (\s -> limitHelper p n s)
+
+limitHelper :: Parser a -> Int -> String -> [(a,String)] 
+limitHelper p n s = map (\(x,y) -> (x,y++addRem)) parseResult
+ where (toParse,addRem) = splitAt n s
+       parseResult = parse p toParse 
+
+parseOperator :: Int -> Int -> Parser Packet 
+parseOperator v t = do lType <- item 
+                       packets <- (case lType of 
+		                  '0' -> (do length <- parseBinNum 15
+		                             limitParser (many parsePacket) length)
+		                  '1' -> (do no <- parseBinNum 11 
+		                             sequence (replicate no parsePacket)))
+                       return $ OpPacket v t packets
+
+
+parsePacket :: Parser Packet 
+parsePacket = do version <- parseBinNum 3 
+                 typeId <- parseBinNum 3
+		 case typeId of 
+		  4 ->  parseValue version
+		  _ -> parseOperator version typeId
+
+
+firstParse x = head (parse parsePacket $ concat $ map charToBinSeq x)
 
 main :: IO ()
 main = 
-  do inp <- head <$> readLines "inputs/input16_test.txt" :: IO String
+  do inp <- head <$> readLines "inputs/input16.txt" :: IO String
      print inp
-     let x = concat $ map charToBinSeq inp
-     print x
-     print (parseHeader x)
-     print (parsePacket x)
+     let packets = fst . firstParse $ inp
+     print (versionSum packets) 
+     print (evaluate packets)
      return ()
