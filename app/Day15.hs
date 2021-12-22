@@ -21,7 +21,6 @@ instance Eq Node where
 instance Ord Node where
  compare (N _ c1 h1) (N _ c2 h2) = compare (c1 + h1) (c2 + h2)
 
-
 getNeighbours :: (Grid a) -> Point -> [Point]
 getNeighbours grid (x,y)= filter (\(x,y) -> x < w && x >= 0 && y < h && y >= 0) [(x-1,y),(x+1,y),(x,y-1),(x,y+1)]
  where (w,h) = getDims grid
@@ -51,7 +50,6 @@ dijkstraIter graph nodeFromKey pq visited goal = if (point==goal) then c else if
        newNodes = map (\(c2, n, _)  -> N n (c+c2) (heuristic n goal)) (map nodeFromKey unvisitedNeighbours) :: [Node]
        newPq = PQ.union redPq (PQ.fromList newNodes)
 
-
 expandGrid grid = concat (buildGrids [(concat (buildRows xs)) | xs <- grid] )
 
 buildGrids :: [[Int]] -> [[[Int]]]
@@ -62,8 +60,6 @@ wrapper i x = if x + i > 9 then (x+i) - 9 else x + i
 
 buildRows :: [Int] -> [[Int]]
 buildRows genRow = [map (wrapper i) genRow  | i <- [0..4]]
-
-
 
 solveGrid grid = dijkstra graph nodeFromKey startNode (w-1,h-1)
  where (graph, nodeFromKey) = constructGridGraph grid
@@ -76,6 +72,5 @@ main =
      let grid = map (map digitToInt) inp :: Grid Int     
      print (solveGrid grid)
      let expGrid = expandGrid grid
-     print (getDims expGrid)
      print (solveGrid expGrid)
      return ()

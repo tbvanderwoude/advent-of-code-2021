@@ -51,6 +51,7 @@ executable day01
       Day13
       Day14
       Day15
+      Day16
       Lib
       Paths_advent_of_code
   hs-source-dirs:
