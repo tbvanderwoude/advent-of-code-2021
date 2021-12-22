@@ -56,8 +56,8 @@ data Packet = ValPacket Int Int | OpPacket Int Int [Packet]
 parseOperator :: Int -> Int -> Parser Packet 
 parseOperator v t = do lType <- item 
                        (OpPacket v t) <$> (case lType of 
-		                  '0' -> (parseBinNum 15 >>= limitParser (many parsePacket))
-		                  '1' -> (parseBinNum 11 >>= parseN parsePacket))
+                          '0' -> (parseBinNum 15 >>= limitParser (many parsePacket))
+                          '1' -> (parseBinNum 11 >>= parseN parsePacket))
                    
 parseValue :: Int -> Parser Packet
 parseValue v = (ValPacket v) . toDec <$> parseChunks 
@@ -65,9 +65,9 @@ parseValue v = (ValPacket v) . toDec <$> parseChunks
 parsePacket :: Parser Packet 
 parsePacket = do version <- parseBinNum 3 
                  typeId <- parseBinNum 3
-		 case typeId of 
-		  4 ->  parseValue version
-		  _ -> parseOperator version typeId
+                 case typeId of 
+                      4 ->  parseValue version
+                      _ -> parseOperator version typeId
 
 firstParse = head . parse parsePacket . concat . map charToBinSeq
 
@@ -80,14 +80,14 @@ typeToFunc :: Int -> ([Int] -> Int)
 typeToFunc t = case t of 
              0 -> sum
              1 -> product
-	     2 -> minimum
-	     3 -> maximum 
-	     5 -> f (>) 
-	     6 -> f (<) 
-	     7 -> f (==) 
-	     _ -> head 
+             2 -> minimum
+             3 -> maximum 
+             5 -> f (>) 
+             6 -> f (<) 
+             7 -> f (==) 
+             _ -> head 
  where f op = \xs -> if (op (xs !! 0) (xs !! 1)) then 1 else 0
-	    
+        
 evaluate (ValPacket _ v) = v
 evaluate (OpPacket _ t ps) = f recEvals 
  where recEvals = map evaluate ps :: [Int]
