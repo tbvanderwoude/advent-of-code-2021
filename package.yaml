@@ -24,6 +24,8 @@ dependencies:
 - text
 - containers
 - pqueue
+- regex-base
+- regex-posix
 
 library:
   source-dirs: src
