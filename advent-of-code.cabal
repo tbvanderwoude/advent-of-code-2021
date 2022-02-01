@@ -56,6 +56,7 @@ executable day01
       Day16
       Day17
       Day18
+      Day19
       Lib
       Parsing
       Paths_advent_of_code
